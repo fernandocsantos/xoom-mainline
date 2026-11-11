@@ -1,0 +1,165 @@
+#!/bin/busybox sh
+# /init do initramfs do Xoom (mainline).
+#
+# Boot normal: monta mmcblk0p10 (Alpine) e faz switch_root.
+# Modo de resgate (Volume - durante o boot, "xoom.resgate" na cmdline ou
+# falha ao montar): não grava nada no eMMC e oferece:
+#  - rede USB (NCM): o tablet fica em 172.16.42.1 e entrega 172.16.42.2 ao PC
+#  - telnet sem senha em 172.16.42.1
+#  - shell serial pela USB (/dev/ttyACM0 no PC)
+#  - cópia do log do boot anterior (pstore) em /pstore-anterior
+#  - diagnóstico automático em /tmp/xoom-check.txt (rode "xoom-check")
+
+/bin/busybox mkdir -p /proc /sys /dev /tmp /run /etc /sbin /usr/bin /usr/sbin
+/bin/busybox --install -s
+
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
+mount -t devtmpfs devtmpfs /dev
+mkdir -p /dev/pts
+mount -t devpts devpts /dev/pts
+mount -t configfs configfs /sys/kernel/config
+mount -t debugfs debugfs /sys/kernel/debug 2>/dev/null
+mount -t pstore pstore /sys/fs/pstore 2>/dev/null
+
+log() {
+	echo "xoom-init: $*" > /dev/kmsg
+	echo "xoom-init: $*"
+}
+
+log "initramfs iniciado (kernel $(uname -r))"
+log "modelo: $(cat /proc/device-tree/model 2>/dev/null)"
+
+# Log do boot anterior, se houve reset a quente
+mkdir -p /pstore-anterior
+if [ -n "$(ls /sys/fs/pstore 2>/dev/null)" ]; then
+	cp /sys/fs/pstore/* /pstore-anterior/ 2>/dev/null
+	log "pstore: log do boot anterior copiado ($(ls /pstore-anterior | tr '\n' ' '))"
+else
+	log "pstore: vazio (nenhum log de boot anterior)"
+fi
+
+# Gadget USB: NCM (rede) + ACM (serial)
+setup_gadget() {
+	G=/sys/kernel/config/usb_gadget/xoom
+	SERIAL=$(sed -n 's/.*androidboot.serialno=\([^ ]*\).*/\1/p' /proc/cmdline)
+
+	mkdir -p $G || return 1
+	echo 0x1d6b > $G/idVendor	# Linux Foundation
+	echo 0x0104 > $G/idProduct	# Multifunction Composite Gadget
+	echo 0x0200 > $G/bcdUSB
+	mkdir -p $G/strings/0x409
+	echo "Linux mainline" > $G/strings/0x409/manufacturer
+	echo "Motorola Xoom (mainline)" > $G/strings/0x409/product
+	echo "${SERIAL:-xoom}" > $G/strings/0x409/serialnumber
+
+	mkdir -p $G/functions/ncm.usb0 $G/functions/acm.GS0
+	mkdir -p $G/configs/c.1/strings/0x409
+	echo "NCM + ACM" > $G/configs/c.1/strings/0x409/configuration
+	echo 500 > $G/configs/c.1/MaxPower
+	ln -s $G/functions/ncm.usb0 $G/configs/c.1/
+	ln -s $G/functions/acm.GS0 $G/configs/c.1/
+
+	# O controlador USB (ci_hdrc) pode demorar a aparecer
+	i=0
+	while [ -z "$(ls /sys/class/udc 2>/dev/null)" ] && [ $i -lt 30 ]; do
+		sleep 1
+		i=$((i + 1))
+	done
+	UDC=$(ls /sys/class/udc 2>/dev/null | head -n 1)
+	if [ -z "$UDC" ]; then
+		log "ERRO: nenhum controlador USB device (/sys/class/udc vazio)"
+		return 1
+	fi
+	echo "$UDC" > $G/UDC || { log "ERRO: falha ao ativar o gadget em $UDC"; return 1; }
+	log "gadget USB ativo em $UDC"
+}
+
+setup_gadget
+GADGET=$?
+
+# Sistema completo na userdata (mmcblk0p10). Volta só se algo falhar.
+entregar_ao_sistema() {
+	i=0
+	while [ ! -b /dev/mmcblk0p10 ] && [ $i -lt 10 ]; do sleep 1; i=$((i + 1)); done
+	mkdir -p /newroot
+	if ! mount -t ext4 -o rw,noatime /dev/mmcblk0p10 /newroot; then
+		log "ERRO: não consegui montar mmcblk0p10"
+		return 1
+	fi
+	if [ ! -e /newroot/sbin/init ]; then
+		log "ERRO: mmcblk0p10 não tem /sbin/init"
+		umount /newroot
+		return 1
+	fi
+	log "entregando o boot ao sistema em mmcblk0p10"
+	umount /sys/kernel/debug /sys/fs/pstore 2>/dev/null
+	# /dev/pts e configfs vão junto (são submontagens)
+	mount --move /dev /newroot/dev
+	mount --move /sys /newroot/sys
+	mount --move /proc /newroot/proc
+	exec switch_root /newroot /sbin/init
+}
+
+# Modo de resgate: Volume - pressionado (PR1 = gpio-137, ativo em nível
+# baixo) ou "xoom.resgate" na cmdline
+if grep -q "xoom.resgate" /proc/cmdline; then
+	log "modo de resgate pedido na cmdline"
+elif grep -E "^ gpio-137 " /sys/kernel/debug/gpio 2>/dev/null | grep -qE " in +lo"; then
+	log "modo de resgate: Volume - pressionado"
+else
+	entregar_ao_sistema
+	log "ficando no modo de resgate"
+fi
+
+if [ $GADGET -eq 0 ]; then
+	ifconfig usb0 172.16.42.1 netmask 255.255.255.0 up
+	touch /tmp/udhcpd.leases
+	udhcpd /etc/udhcpd.conf
+	telnetd -l /bin/sh
+	log "rede USB: 172.16.42.1 (telnet porta 23)"
+
+	# Shell na serial USB, reiniciado se a sessão fechar
+	(
+		while true; do
+			# cttyhack torna a ttyGS0 o terminal de controle (Ctrl+C funciona)
+			[ -c /dev/ttyGS0 ] && setsid sh -c 'exec cttyhack sh' </dev/ttyGS0 >/dev/ttyGS0 2>&1
+			sleep 2
+		done
+	) &
+fi
+
+# Sensores compilados como módulo (estão em /lib/modules do initramfs)
+for m in bmp280-i2c kxcjk-1013 ak8975 st_gyro_i2c lm90; do
+	modprobe $m 2>/dev/null || log "falha ao carregar o módulo $m"
+done
+
+# Wi-Fi BCM4329 (firmware e NVRAM em /lib/firmware/brcm)
+if modprobe brcmfmac; then
+	i=0
+	while [ ! -e /sys/class/net/wlan0 ] && [ $i -lt 15 ]; do sleep 1; i=$((i + 1)); done
+	if [ -e /sys/class/net/wlan0 ]; then
+		ifconfig wlan0 up && log "wlan0 ativa, MAC $(cat /sys/class/net/wlan0/address)"
+	else
+		log "ERRO: brcmfmac carregou, mas wlan0 não apareceu"
+	fi
+else
+	log "falha ao carregar o módulo brcmfmac"
+fi
+
+# Diagnóstico depois que os drivers terminarem de carregar
+(
+	sleep 20
+	xoom-check > /tmp/xoom-check.txt 2>&1
+	log "diagnóstico salvo em /tmp/xoom-check.txt"
+	# Resumo também no log do kernel, para ir ao pstore se travar depois
+	grep -E '^(##|  !)' /tmp/xoom-check.txt | while read -r l; do log "$l"; done
+) &
+
+# Sinal de vida na tela: uma linha a cada 10 s
+n=0
+while true; do
+	sleep 10
+	n=$((n + 10))
+	echo "xoom-init vivo: ${n}s, usb0=$(cat /sys/class/net/usb0/operstate 2>/dev/null || echo ausente)"
+done

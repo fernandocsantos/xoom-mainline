@@ -1,0 +1,8 @@
+out-*/
+*.img
+zImage*
+initramfs/extras/
+initramfs/busybox
+initramfs/*.list
+ssh/
+stock/

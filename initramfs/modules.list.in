@@ -1,0 +1,53 @@
+dir /lib 755 0 0
+dir /lib/firmware 755 0 0
+dir /lib/firmware/brcm 755 0 0
+dir /lib/modules 755 0 0
+dir /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty 755 0 0
+dir /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel 755 0 0
+dir /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers 755 0 0
+dir /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/hwmon 755 0 0
+dir /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/iio 755 0 0
+dir /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/iio/accel 755 0 0
+dir /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/iio/common 755 0 0
+dir /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/iio/common/st_sensors 755 0 0
+dir /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/iio/gyro 755 0 0
+dir /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/iio/magnetometer 755 0 0
+dir /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/iio/pressure 755 0 0
+dir /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/net 755 0 0
+dir /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/net/wireless 755 0 0
+dir /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/net/wireless/broadcom 755 0 0
+dir /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/net/wireless/broadcom/brcm80211 755 0 0
+dir /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/net/wireless/broadcom/brcm80211/brcmfmac 755 0 0
+dir /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/net/wireless/broadcom/brcm80211/brcmfmac/bca 755 0 0
+dir /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/net/wireless/broadcom/brcm80211/brcmfmac/cyw 755 0 0
+dir /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/net/wireless/broadcom/brcm80211/brcmfmac/wcc 755 0 0
+dir /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/net/wireless/broadcom/brcm80211/brcmutil 755 0 0
+file /lib/firmware/brcm/brcmfmac4329-sdio.bin @XOOM@/initramfs/extras/lib/firmware/brcm/brcmfmac4329-sdio.bin 644 0 0
+file /lib/firmware/brcm/brcmfmac4329-sdio.motorola,stingray.txt @XOOM@/initramfs/extras/lib/firmware/brcm/brcmfmac4329-sdio.motorola,stingray.txt 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/hwmon/lm90.ko @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/hwmon/lm90.ko 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/iio/accel/kxcjk-1013.ko @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/iio/accel/kxcjk-1013.ko 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/iio/common/st_sensors/st_sensors_i2c.ko @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/iio/common/st_sensors/st_sensors_i2c.ko 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/iio/common/st_sensors/st_sensors.ko @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/iio/common/st_sensors/st_sensors.ko 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/iio/gyro/st_gyro_i2c.ko @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/iio/gyro/st_gyro_i2c.ko 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/iio/gyro/st_gyro.ko @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/iio/gyro/st_gyro.ko 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/iio/magnetometer/ak8975.ko @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/iio/magnetometer/ak8975.ko 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/iio/pressure/bmp280-i2c.ko @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/iio/pressure/bmp280-i2c.ko 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/iio/pressure/bmp280.ko @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/iio/pressure/bmp280.ko 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/net/wireless/broadcom/brcm80211/brcmfmac/bca/brcmfmac-bca.ko @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/net/wireless/broadcom/brcm80211/brcmfmac/bca/brcmfmac-bca.ko 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/net/wireless/broadcom/brcm80211/brcmfmac/brcmfmac.ko @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/net/wireless/broadcom/brcm80211/brcmfmac/brcmfmac.ko 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/net/wireless/broadcom/brcm80211/brcmfmac/cyw/brcmfmac-cyw.ko @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/net/wireless/broadcom/brcm80211/brcmfmac/cyw/brcmfmac-cyw.ko 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/net/wireless/broadcom/brcm80211/brcmfmac/wcc/brcmfmac-wcc.ko @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/net/wireless/broadcom/brcm80211/brcmfmac/wcc/brcmfmac-wcc.ko 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/net/wireless/broadcom/brcm80211/brcmutil/brcmutil.ko @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/kernel/drivers/net/wireless/broadcom/brcm80211/brcmutil/brcmutil.ko 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.alias @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.alias 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.alias.bin @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.alias.bin 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.builtin @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.builtin 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.builtin.alias.bin @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.builtin.alias.bin 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.builtin.bin @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.builtin.bin 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.builtin.modinfo @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.builtin.modinfo 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.dep @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.dep 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.dep.bin @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.dep.bin 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.devname @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.devname 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.order @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.order 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.softdep @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.softdep 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.symbols @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.symbols 644 0 0
+file /lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.symbols.bin @XOOM@/initramfs/extras/lib/modules/7.3.0-rc7-g0fcb05b72344-dirty/modules.symbols.bin 644 0 0

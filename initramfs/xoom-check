@@ -1,0 +1,93 @@
+#!/bin/sh
+# Diagnóstico do kernel mainline no Xoom. Só lê; não altera nada.
+# Linhas "##" são seções; linhas "  !" são problemas.
+
+sec() { echo; echo "## $*"; }
+bad() { echo "  ! $*"; }
+
+sec "Kernel e placa"
+uname -a
+echo "modelo: $(cat /proc/device-tree/model 2>/dev/null)"
+echo "cmdline: $(cat /proc/cmdline)"
+echo "uptime: $(cut -d' ' -f1 /proc/uptime)s"
+grep -E "MemTotal|MemFree" /proc/meminfo
+
+sec "Erros e avisos no dmesg"
+dmesg | grep -iE "error|fail|unable|timeout|dummy regulator|-121|-110|panic|oops|bug:" | tail -n 40
+
+sec "Dispositivos esperando dependência (devices_deferred)"
+if [ -r /sys/kernel/debug/devices_deferred ]; then
+	D=$(cat /sys/kernel/debug/devices_deferred)
+	if [ -n "$D" ]; then echo "$D"; bad "há dispositivos sem driver ativo (veja acima)"; else echo "nenhum"; fi
+else
+	bad "debugfs indisponível (CONFIG_DEBUG_FS?)"
+fi
+
+sec "Reguladores (CPCAP)"
+if [ -r /sys/kernel/debug/regulator/regulator_summary ]; then
+	cat /sys/kernel/debug/regulator/regulator_summary
+else
+	for r in /sys/class/regulator/regulator.*; do
+		echo "$(cat $r/name 2>/dev/null): $(cat $r/state 2>/dev/null) $(cat $r/microvolts 2>/dev/null)uV"
+	done
+fi
+ls /sys/class/regulator 2>/dev/null | grep -q . || bad "nenhum regulador registrado"
+grep -q vdd_core /sys/class/regulator/*/name 2>/dev/null || bad "vdd_core (CPCAP SW2) não registrado"
+
+sec "Armazenamento"
+ls /sys/class/mmc_host 2>/dev/null
+cat /proc/partitions
+grep -q mmcblk0 /proc/partitions || bad "eMMC (mmcblk0) não apareceu"
+grep -q mmcblk0p7 /proc/partitions || bad "partições do eMMC não apareceram (GPT do Tegra)"
+
+sec "Dispositivos I2C (nome -> driver)"
+for d in /sys/bus/i2c/devices/*-*; do
+	# i2c-N são os próprios barramentos, não dispositivos
+	case $(basename $d) in i2c-*) continue ;; esac
+	[ -e "$d/name" ] || continue
+	drv=$(basename "$(readlink $d/driver 2>/dev/null)" 2>/dev/null)
+	echo "$(basename $d) $(cat $d/name) -> ${drv:-SEM DRIVER}"
+	[ -z "$drv" ] && bad "$(basename $d) $(cat $d/name) sem driver ligado"
+done
+
+sec "Tela e backlight"
+ls /sys/class/drm 2>/dev/null
+for c in /sys/class/drm/card*-*; do
+	[ -e "$c/status" ] && echo "$(basename $c): $(cat $c/status) $(head -n 1 $c/modes 2>/dev/null)"
+done
+for b in /sys/class/backlight/*; do
+	[ -e "$b/brightness" ] && echo "$(basename $b): $(cat $b/brightness)/$(cat $b/max_brightness)"
+done
+ls /sys/class/backlight 2>/dev/null | grep -q . || bad "nenhum backlight registrado (LP8550)"
+cat /proc/fb 2>/dev/null
+
+sec "Entrada (teclas e touch)"
+grep -E "^N: Name" /proc/bus/input/devices
+grep -q "Atmel" /proc/bus/input/devices || bad "touch Atmel não registrado"
+
+sec "USB device"
+ls /sys/class/udc 2>/dev/null
+cat /sys/class/udc/*/state 2>/dev/null
+
+sec "Wi-Fi"
+dmesg | grep -iE "brcmf|wlan0" | tail -n 15
+ls /sys/class/ieee80211 2>/dev/null
+if [ -e /sys/class/net/wlan0 ]; then
+	echo "wlan0: $(cat /sys/class/net/wlan0/operstate) MAC $(cat /sys/class/net/wlan0/address)"
+else
+	bad "wlan0 não existe"
+fi
+
+sec "Sensores IIO"
+for i in /sys/bus/iio/devices/iio:device*; do
+	[ -e "$i/name" ] && echo "$(basename $i): $(cat $i/name)"
+done
+ls /sys/bus/iio/devices 2>/dev/null | grep -q iio || bad "nenhum sensor IIO registrado"
+
+sec "Temperaturas"
+for h in /sys/class/hwmon/hwmon*; do
+	[ -e "$h/temp1_input" ] && echo "$(cat $h/name): $(cat $h/temp1_input)"
+done
+
+sec "Log do boot anterior (/pstore-anterior)"
+ls -la /pstore-anterior 2>/dev/null
