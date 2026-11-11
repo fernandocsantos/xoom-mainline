@@ -48,6 +48,7 @@ sozinho, reconstrução do rootfs pelo script nunca testada do zero.
 | `userspace/` | reboot com parâmetro (fastboot/recovery), AT do modem, endereço do Bluetooth |
 | `grate/wlrshaders/` | os shaders do wlroots em assembly do Tegra (com e sem blend) e o gerador do `grate_wlr_shaders.h` do fork do Mesa. Montados com o `gen_shader_bin` do xf86-video-opentegra |
 | `grate/wlrtest/` | teste dos shaders e do estado do wlroots no GR3D, conferindo pixels |
+| `docs/diario-tecnico.md` | o diário técnico do port (14 a 19/10/2026): cada problema, a causa e a correção, com os números |
 
 ## Montar e gravar
 
@@ -91,7 +92,8 @@ Mainline Linux (7.3-rc7) and Alpine Linux, with Sxmo and Phosh, on a 2011 Motoro
 driver. The port started on 2026-10-14 (first boot: Tux with a blue beak, red and blue
 swapped) and the tablet has been in daily use since.
 
-This repository holds the tools, the initramfs and the tests; changes to third-party
+This repository holds the tools, the initramfs, the tests and the technical diary of the port
+(`docs/diario-tecnico.md`, in Portuguese); changes to third-party
 software live in the forks listed in the table above (kernel, grate Mesa and libdrm,
 wlroots, libhybris). Sister repositories: xoom-alpine (root filesystem and configuration)
 and xoom-gps (GPS through the Android HAL).
